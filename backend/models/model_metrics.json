@@ -1,0 +1,150 @@
+{
+  "diabetes": {
+    "logistic_regression": {
+      "accuracy": 0.9928802740078456,
+      "precision": 1.0,
+      "recall": 0.993920333491921,
+      "f1_score": 0.9965958425088819,
+      "roc_auc": 0.9996242543797849
+    },
+    "decision_tree": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "random_forest": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "xgboost": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "svm": {
+      "accuracy": 0.9971544368647073,
+      "precision": 1.0,
+      "recall": 0.997753029016312,
+      "f1_score": 0.9938978269103336,
+      "roc_auc": 0.9984500493166126
+    }
+  },
+  "heart_disease": {
+    "logistic_regression": {
+      "accuracy": 0.994,
+      "precision": 1.0,
+      "recall": 0.9936154803388693,
+      "f1_score": 0.9945259601783597,
+      "roc_auc": 1.0
+    },
+    "decision_tree": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "random_forest": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "xgboost": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "svm": {
+      "accuracy": 0.9933431947536244,
+      "precision": 0.9972038056040532,
+      "recall": 0.9945842939375302,
+      "f1_score": 0.9914306989033399,
+      "roc_auc": 0.9966666666666666
+    }
+  },
+  "kidney_disease": {
+    "logistic_regression": {
+      "accuracy": 0.996,
+      "precision": 1.0,
+      "recall": 0.9929039875090003,
+      "f1_score": 0.996514758717026,
+      "roc_auc": 1.0
+    },
+    "decision_tree": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "random_forest": {
+      "accuracy": 0.998,
+      "precision": 1.0,
+      "recall": 0.9970330636972273,
+      "f1_score": 0.9960678389996026,
+      "roc_auc": 1.0
+    },
+    "xgboost": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "svm": {
+      "accuracy": 0.994,
+      "precision": 0.9964363404258152,
+      "recall": 0.991753651758593,
+      "f1_score": 0.9950455859655193,
+      "roc_auc": 0.9963282562765717
+    }
+  },
+  "liver_disease": {
+    "logistic_regression": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "decision_tree": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "random_forest": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 0.9999999999999999
+    },
+    "xgboost": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    "svm": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    }
+  }
+}

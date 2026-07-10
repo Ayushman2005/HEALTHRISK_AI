@@ -1,0 +1,128 @@
+# ==========================================
+# HEALTHRISK AI ROOT GITIGNORE
+# ==========================================
+
+# ------------------------------------------
+# Frontend dependencies & output
+# ------------------------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/build/
+frontend/out/
+frontend/.npm/
+frontend/.eslintcache
+frontend/.stylelintcache
+frontend/*.tsbuildinfo
+
+# ------------------------------------------
+# Python Backend
+# ------------------------------------------
+# Byte-compiled / optimized / DLL files
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+
+# C extensions
+backend/*.so
+
+# Distribution / packaging
+backend/.Python
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/share/python-wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+backend/MANIFEST
+
+# PyInstaller
+backend/*.manifest
+backend/*.spec
+
+# Installer logs
+backend/pip-log.txt
+backend/pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+backend/htmlcov/
+backend/.tox/
+backend/.nox/
+backend/.coverage
+backend/.coverage.*
+backend/.cache
+backend/nosetests.xml
+backend/coverage.xml
+backend/*.cover
+backend/*.py,cover
+backend/.hypothesis/
+backend/.pytest_cache/
+backend/cover/
+
+# Translations
+backend/*.mo
+backend/*.pot
+
+# Flask & Webassets
+backend/instance/
+backend/.webassets-cache
+
+# Jupyter Notebook
+backend/.ipynb_checkpoints
+
+# IPython
+backend/.ipython/
+
+# pyenv & virtualenv
+backend/.python-version
+backend/.env
+backend/.venv
+backend/venv/
+backend/ENV/
+backend/env/
+backend/ENV/local/
+backend/ENV/lib/
+
+# Databases & local storage
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+backend/models/local_storage.db
+
+# ------------------------------------------
+# Global OS & IDE Files
+# ------------------------------------------
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editors (VSCode, PyCharm, etc.)
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
