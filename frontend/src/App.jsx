@@ -187,7 +187,7 @@ export default function App() {
     name: '', age: '35', gender: 'male', height: '170', weight: '70',
     smoking: 'no', alcohol: 'low', physicalActivity: 'moderate', sleepDuration: 7,
     bpSystolic: 120, bpDiastolic: 80, cholesterol: 180, glucose: 90, insulin: 8, heartRate: 70,
-    algorithm: 'random_forest'
+    algorithm: 'auto'
   });
   const [errors, setErrors] = useState({});
   const [predicting, setPredicting] = useState(false);
@@ -893,7 +893,7 @@ export default function App() {
       name: '', age: '35', gender: 'male', height: '170', weight: '70',
       smoking: 'no', alcohol: 'low', physicalActivity: 'moderate', sleepDuration: 7,
       bpSystolic: 120, bpDiastolic: 80, cholesterol: 180, glucose: 90, insulin: 8, heartRate: 70,
-      algorithm: 'random_forest'
+      algorithm: 'auto'
     });
     setErrors({});
   };
@@ -1118,7 +1118,7 @@ export default function App() {
             <div className="w-16 h-16 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-4 filter drop-shadow-[0_0_12px_rgba(99,102,241,0.25)]">
               <Activity className="w-8 h-8" />
             </div>
-            <h2 className="font-extrabold text-3xl text-white tracking-tight">HealthRisk AI</h2>
+            <h2 className="font-extrabold text-3xl text-white tracking-tight">HealthSenceAI</h2>
             <p className="text-sm text-slate-400 mt-2 max-w-sm">
               {authMode === 'login' 
                 ? 'Sign in to access your clinical dashboard and models' 
@@ -1305,7 +1305,7 @@ export default function App() {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/35 group-hover:scale-105 transition-transform duration-300">
             <Activity className="w-4.5 h-4.5 text-white filter drop-shadow-[0_0_4px_rgba(255,255,255,0.4)]" />
           </div>
-          <span className="bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">HealthRisk <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">AI</span></span>
+          <span className="bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">HealthSence <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">AI</span></span>
         </div>
 
         {/* Logged In User Profile */}
@@ -1422,7 +1422,7 @@ export default function App() {
         <header className="lg:hidden flex items-center justify-between mb-8 no-print">
           <div className="flex items-center gap-2 font-bold text-lg text-slate-100">
             <Activity className="w-6 h-6 text-indigo-500" />
-            <span>HealthRisk AI</span>
+            <span>HealthSenceAI</span>
           </div>
           <button 
             onClick={() => setSidebarOpen(prev => !prev)}
@@ -1530,7 +1530,7 @@ export default function App() {
 
                       {latestAssessment && (
                         <div className="flex justify-center py-4">
-                          <div className="relative w-44 h-44 flex items-center justify-center">
+                          <div className="circle-progress-container relative w-44 h-44 flex items-center justify-center cursor-pointer">
                             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
                               <circle className="stroke-slate-200 dark:stroke-slate-800 fill-none" cx="80" cy="80" r="72" strokeWidth="10"></circle>
                               <circle 
@@ -1673,7 +1673,7 @@ export default function App() {
               {[
                 { step: 1, label: 'Personal Profile' },
                 { step: 2, label: 'Lifestyle Habits' },
-                { step: 3, label: 'Biomarkers & Algorithm' }
+                { step: 3, label: 'Biomarkers' }
               ].map(item => (
                 <div key={item.step} className="flex flex-col items-center gap-2 relative z-20">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold border-2 transition-all ${
@@ -1921,21 +1921,7 @@ export default function App() {
                         </div>
                       ))}
 
-                      {/* Algorithm selector */}
-                      <div className="md:col-span-2 flex flex-col gap-2 border-t border-slate-200 dark:border-slate-800 pt-6">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Predictive Machine Learning Algorithm</label>
-                        <select 
-                          value={formData.algorithm}
-                          onChange={e => setFormData(prev => ({ ...prev, algorithm: e.target.value }))}
-                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 text-sm font-semibold text-slate-300 transition cursor-pointer"
-                        >
-                          <option value="random_forest">Random Forest Classifier (Ensemble Trees)</option>
-                          <option value="logistic_regression">Logistic Regression (Linear Classifier)</option>
-                          <option value="decision_tree">Decision Tree Classifier</option>
-                          <option value="xgboost">XGBoost Gradient Boosting Classifier</option>
-                          <option value="svm">Support Vector Machine (SVM / Radial Basis Kernel)</option>
-                        </select>
-                      </div>
+
 
                     </div>
                   </div>
@@ -2012,7 +1998,7 @@ export default function App() {
             {/* Health Score Overview card */}
             <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8 print-card">
               <div className="flex flex-col items-center">
-                <div className="relative w-40 h-40 flex items-center justify-center">
+                <div className="circle-progress-container relative w-40 h-40 flex items-center justify-center cursor-pointer">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
                     <circle className="stroke-slate-200 dark:stroke-slate-800 fill-none" cx="80" cy="80" r="72" strokeWidth="10"></circle>
                     <circle 

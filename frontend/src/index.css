@@ -49,3 +49,116 @@
 .animate-spin-slow {
   animation: spin-slow 12s linear infinite;
 }
+
+/* Premium ambient grid background and glow points */
+body {
+  position: relative;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.04) 0%, transparent 40%),
+    linear-gradient(rgba(255, 255, 255, 0.003) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.003) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 45px 45px, 45px 45px;
+  pointer-events: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.015) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.015) 0%, transparent 40%),
+    linear-gradient(rgba(0, 0, 0, 0.008) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.008) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 45px 45px, 45px 45px;
+  pointer-events: none;
+}
+
+/* Premium Card hover lift & glow */
+.bg-white.dark\:bg-slate-900\/60,
+.bg-slate-900\/60 {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.bg-white.dark\:bg-slate-900\/60:hover,
+.bg-slate-900\/60:hover {
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.4), 0 0 15px 1px rgba(99, 102, 241, 0.08);
+  border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+/* Premium Buttons hover shimmer */
+.btn {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Range input slider thumb interactive scale */
+input[type="range"] {
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.35);
+}
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.5);
+}
+input[type="range"]::-moz-range-thumb {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.35);
+}
+input[type="range"]::-moz-range-thumb:active {
+  transform: scale(1.5);
+}
+
+/* Subtle fade in animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+/* Hover effects for circular health score widget */
+.circle-progress-container {
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.circle-progress-container:hover {
+  transform: scale(1.04);
+}

@@ -98,6 +98,7 @@ CORS(app) # Enable Cross-Origin Resource Sharing
 scaler = None
 feature_names = []
 models = {}
+model_metrics = {}
 diseases = ['diabetes', 'heart_disease', 'kidney_disease', 'liver_disease']
 algs = ['logistic_regression', 'decision_tree', 'random_forest', 'xgboost', 'svm']
 
@@ -284,6 +285,16 @@ def load_ml_assets():
             feature_names = json.load(f)
         print("  Feature names mapping loaded successfully.")
         
+    # Load model metrics
+    metrics_path = "models/model_metrics.json"
+    if os.path.exists(metrics_path):
+        try:
+            with open(metrics_path, "r") as f:
+                model_metrics = json.load(f)
+            print("  Model metrics loaded successfully.")
+        except Exception as e:
+            print(f"  WARNING: Failed to load model_metrics.json: {e}")
+            
     # Load all models
     loaded_count = 0
     for disease in diseases:
@@ -299,6 +310,35 @@ def load_ml_assets():
 # Run Database and ML startup routines
 init_db()
 load_ml_assets()
+
+def select_best_algorithm_for_disease(disease):
+    global model_metrics
+    pref_order = ['random_forest', 'xgboost', 'svm', 'logistic_regression', 'decision_tree']
+    
+    if not model_metrics or disease not in model_metrics:
+        return 'random_forest'
+        
+    disease_algs = model_metrics[disease]
+    best_alg = 'random_forest'
+    best_score = (-1.0, -1.0, -1.0) # (f1_score, accuracy, roc_auc)
+    
+    for alg in algs:
+        if alg in disease_algs:
+            metrics = disease_algs[alg]
+            f1 = metrics.get('f1_score', 0.0)
+            acc = metrics.get('accuracy', 0.0)
+            auc = metrics.get('roc_auc', 0.0)
+            
+            current_score = (f1, acc, auc)
+            if current_score > best_score:
+                best_score = current_score
+                best_alg = alg
+            elif current_score == best_score:
+                # Tie breaker: choose the one that appears earlier in pref_order
+                if pref_order.index(alg) < pref_order.index(best_alg):
+                    best_alg = alg
+                    
+    return best_alg
 
 def encode_input(data, bmi):
     # Match the order of numeric variables in train_models.py
@@ -376,20 +416,33 @@ def predict():
         X_scaled = X.copy()
         X_scaled[:, :11] = X_num_scaled
         
-        # 4. Determine algorithm and run predictions
-        selected_alg = data.get('algorithm', 'random_forest').lower()
-        if selected_alg not in algs:
-            selected_alg = 'random_forest'
-            
+        # 4. Determine algorithm and run predictions (fallback / dynamic selection)
+        passed_alg = data.get('algorithm', 'auto').lower()
+        
         predictions = {}
+        selected_algorithms = {}
         for disease in diseases:
+            if passed_alg in algs:
+                best_alg = passed_alg
+            else:
+                best_alg = select_best_algorithm_for_disease(disease)
+                
+            selected_algorithms[disease] = best_alg
+            
             disease_models = models.get(disease, {})
-            model = disease_models.get(selected_alg)
+            model = disease_models.get(best_alg)
             if model is None:
-                return jsonify({'error': f'Model for {disease} ({selected_alg}) not found'}), 500
+                # Fallback to random_forest if the best algorithm's model is not loaded
+                model = disease_models.get('random_forest')
+                if model is None:
+                    return jsonify({'error': f'Model for {disease} not found'}), 500
+                best_alg = 'random_forest'
+                selected_algorithms[disease] = best_alg
                 
             prob = model.predict_proba(X_scaled)[0][1]
             predictions[disease] = int(round(prob * 100))
+            
+        print(f"Predictions run. Selected algorithms: {selected_algorithms}")
             
         # 5. Calculate Overall Health Score based on predictions
         avg_risk = sum(predictions.values()) / len(diseases)
@@ -524,7 +577,8 @@ def predict():
         }
         
         # 9. SAVE TO MYSQL DATABASE
-        assess_id = f"assess-{int(np.round(np.random.rand() * 1000000))}-{selected_alg}"
+        alg_suffix = passed_alg if passed_alg in algs else 'auto'
+        assess_id = f"assess-{int(np.round(np.random.rand() * 1000000))}-{alg_suffix}"
         from datetime import datetime
         timestamp_str = datetime.now().isoformat()
         
