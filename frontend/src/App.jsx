@@ -201,7 +201,7 @@ export default function App() {
   const [historySearch, setHistorySearch] = useState('');
   const [historyFilter, setHistoryFilter] = useState('all');
 
-  // Insights filter state
+  // Insights filter state 
   const [insightsUser, setInsightsUser] = useState('');
 
   // Toast Notification state
@@ -470,6 +470,94 @@ export default function App() {
       }
     } catch (err) {
       showToast("Server unreachable", "danger");
+    }
+  };
+
+  const seedDemoData = async () => {
+    try {
+      showToast("Seeding demo patient profiles...", "primary");
+      
+      const payload1 = {
+        name: "John Doe", age: 58, gender: "male", height: 175, weight: 88,
+        smoking: "yes", alcohol: "high", physicalActivity: "sedentary", sleepDuration: 5.5,
+        bpSystolic: 145, bpDiastolic: 92, cholesterol: 242, glucose: 112, insulin: 16, heartRate: 82,
+        algorithm: 'auto'
+      };
+      
+      const payload2 = {
+        name: "Jane Smith", age: 29, gender: "female", height: 168, weight: 58,
+        smoking: "no", alcohol: "low", physicalActivity: "active", sleepDuration: 8.0,
+        bpSystolic: 115, bpDiastolic: 75, cholesterol: 175, glucose: 82, insulin: 8, heartRate: 64,
+        algorithm: 'auto'
+      };
+      
+      const payload3 = {
+        name: "Alex Rivera", age: 46, gender: "other", height: 180, weight: 102,
+        smoking: "no", alcohol: "moderate", physicalActivity: "moderate", sleepDuration: 6.5,
+        bpSystolic: 135, bpDiastolic: 85, cholesterol: 210, glucose: 145, insulin: 28, heartRate: 74,
+        algorithm: 'auto'
+      };
+      
+      const payloads = [payload1, payload2, payload3];
+      const newRecords = [];
+      
+      for (const payload of payloads) {
+        try {
+          const res = await fetch("http://localhost:5000/api/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            const resultsData = await res.json();
+            const record = {
+              id: resultsData.id,
+              name: resultsData.name,
+              timestamp: resultsData.timestamp,
+              personal: resultsData.personal,
+              lifestyle: resultsData.lifestyle,
+              medical: resultsData.medical,
+              results: {
+                risks: resultsData.risks,
+                overallScore: resultsData.overallScore,
+                confidence: resultsData.confidence,
+                recommendations: resultsData.recommendations,
+                explanations: resultsData.explanations
+              }
+            };
+            newRecords.push(record);
+          } else {
+            throw new Error();
+          }
+        } catch (e) {
+          const finalBMI = parseFloat((payload.weight / ((payload.height / 100) * (payload.height / 100))).toFixed(1));
+          const localResult = computeHeuristicFallback(payload, finalBMI);
+          const mockId = `assess-fallback-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+          const mockTime = new Date().toISOString();
+          
+          const record = {
+            id: mockId,
+            name: payload.name,
+            timestamp: mockTime,
+            personal: { name: payload.name, age: payload.age, gender: payload.gender, height: payload.height, weight: payload.weight, bmi: finalBMI },
+            lifestyle: { smoking: payload.smoking, alcohol: payload.alcohol, physicalActivity: payload.physicalActivity, sleepDuration: payload.sleepDuration },
+            medical: { bpSystolic: payload.bpSystolic, bpDiastolic: payload.bpDiastolic, cholesterol: payload.cholesterol, glucose: payload.glucose, insulin: payload.insulin, heartRate: payload.heartRate },
+            results: localResult
+          };
+          newRecords.push(record);
+        }
+      }
+      
+      setAssessments(prev => [...newRecords, ...prev]);
+      if (newRecords.length > 0) {
+        setLatestAssessment(newRecords[0]);
+        setActiveUser(newRecords[0].name);
+        setInsightsUser(newRecords[0].name);
+      }
+      showToast("Demo patient profiles loaded successfully!", "success");
+      fetchMetrics();
+    } catch (err) {
+      showToast("Failed to seed demo data", "danger");
     }
   };
 
@@ -1101,6 +1189,37 @@ export default function App() {
     return { label: 'Low Risk', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', bar: 'bg-emerald-500' };
   };
 
+  const getBiomarkerStatus = (key, val) => {
+    switch (key) {
+      case 'bpSystolic':
+        if (val < 120) return { label: 'Optimal', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
+        if (val < 140) return { label: 'Elevated', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' };
+        return { label: 'Hypertension', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' };
+      case 'bpDiastolic':
+        if (val < 80) return { label: 'Optimal', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
+        if (val < 90) return { label: 'Elevated', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' };
+        return { label: 'Hypertension', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' };
+      case 'cholesterol':
+        if (val < 200) return { label: 'Desirable', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
+        if (val < 240) return { label: 'Borderline', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' };
+        return { label: 'High Risk', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' };
+      case 'glucose':
+        if (val < 100) return { label: 'Normal Fasting', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
+        if (val < 126) return { label: 'Impaired Fasting', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' };
+        return { label: 'Diabetic Range', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' };
+      case 'insulin':
+        if (val < 15) return { label: 'Normal', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
+        if (val < 25) return { label: 'Borderline', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' };
+        return { label: 'Insulin Resistant', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' };
+      case 'heartRate':
+        if (val >= 60 && val <= 90) return { label: 'Optimal', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' };
+        if ((val >= 50 && val < 60) || (val > 90 && val <= 100)) return { label: 'Borderline', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' };
+        return { label: 'High/Low Alert', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' };
+      default:
+        return { label: 'Normal', color: 'text-slate-400 bg-slate-500/10 border-slate-500/20' };
+    }
+  };
+
   const uniquePatients = useMemo(() => {
     return [...new Set(assessments.map(a => a.name))];
   }, [assessments]);
@@ -1295,7 +1414,14 @@ export default function App() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen relative overflow-hidden">
+      
+      {/* Ambient background glow points */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
+        <div className="absolute top-[10%] left-[5%] w-[45vw] h-[45vw] rounded-full bg-indigo-500/5 dark:bg-indigo-500/8 blur-[120px] animate-float" />
+        <div className="absolute bottom-[10%] right-[5%] w-[50vw] h-[50vw] rounded-full bg-violet-500/5 dark:bg-violet-500/8 blur-[130px] animate-float-reverse" />
+        <div className="absolute top-[40%] right-[30%] w-[35vw] h-[35vw] rounded-full bg-cyan-500/3 dark:bg-cyan-500/5 blur-[100px] animate-float" />
+      </div>
       
       {/* Sidebar Navigation */}
       <aside className="w-[280px] bg-slate-950 border-r border-slate-900 p-6 flex flex-col fixed top-0 bottom-0 left-0 z-50 transition-transform lg:translate-x-0 no-print" style={{ transform: sidebarOpen ? 'translateX(0)' : undefined }}>
@@ -1464,9 +1590,14 @@ export default function App() {
                 <Inbox className="w-16 h-16 text-slate-400" />
                 <h3 className="font-bold text-lg dark:text-slate-100 text-slate-800">No assessments found</h3>
                 <p className="text-sm text-slate-500 max-w-sm">Connect a MySQL database or fill the form wizard to display clinical statistics.</p>
-                <button onClick={() => setCurrentTab('wizard')} className="btn bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-5 rounded-xl inline-flex items-center gap-2 cursor-pointer transition shadow-lg shadow-indigo-600/20">
-                  <HeartPulse className="w-5 h-5" /> Start Assessment
-                </button>
+                <div className="flex flex-col sm:flex-row gap-4 mt-2">
+                  <button onClick={() => setCurrentTab('wizard')} className="btn bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-2.5 px-5 rounded-xl inline-flex items-center gap-2 cursor-pointer transition shadow-lg shadow-indigo-600/20">
+                    <HeartPulse className="w-5 h-5" /> Start Assessment
+                  </button>
+                  <button onClick={seedDemoData} className="btn bg-slate-800 hover:bg-slate-700 text-indigo-300 hover:text-indigo-200 border border-slate-700/60 font-semibold py-2.5 px-5 rounded-xl inline-flex items-center gap-2 cursor-pointer transition">
+                    <Sparkles className="w-5 h-5" /> Seed Demo Patient Data
+                  </button>
+                </div>
               </div>
             ) : (
               <>
@@ -1904,22 +2035,30 @@ export default function App() {
                         { key: 'glucose', label: 'Fasting Blood Glucose (mg/dL)', min: 50, max: 300 },
                         { key: 'insulin', label: 'Fasting Insulin (µIU/mL)', min: 2, max: 60 },
                         { key: 'heartRate', label: 'Resting Heart Rate (BPM)', min: 40, max: 150 }
-                      ].map(item => (
-                        <div key={item.key} className="flex flex-col gap-2">
-                          <div className="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            <span>{item.label}</span>
-                            <span className="text-indigo-400 font-extrabold text-sm">{formData[item.key]}</span>
+                      ].map(item => {
+                        const statusInfo = getBiomarkerStatus(item.key, formData[item.key]);
+                        return (
+                          <div key={item.key} className="flex flex-col gap-2.5 bg-slate-900/30 hover:bg-slate-900/55 border border-slate-900/60 hover:border-slate-800/80 rounded-2xl p-5 transition-all duration-300">
+                            <div className="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-wider">
+                              <span>{item.label}</span>
+                              <div className="flex items-center gap-2 select-none">
+                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border transition-colors ${statusInfo.color}`}>
+                                  {statusInfo.label}
+                                </span>
+                                <span className="text-indigo-400 font-extrabold text-sm">{formData[item.key]}</span>
+                              </div>
+                            </div>
+                            <input 
+                              type="range" 
+                              min={item.min} 
+                              max={item.max}
+                              value={formData[item.key]}
+                              onChange={e => setFormData(prev => ({ ...prev, [item.key]: parseInt(e.target.value) }))}
+                              className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600 mt-2"
+                            />
                           </div>
-                          <input 
-                            type="range" 
-                            min={item.min} 
-                            max={item.max}
-                            value={formData[item.key]}
-                            onChange={e => setFormData(prev => ({ ...prev, [item.key]: parseInt(e.target.value) }))}
-                            className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600 mt-1.5"
-                          />
-                        </div>
-                      ))}
+                        );
+                      })}
 
 
 
@@ -2068,7 +2207,10 @@ export default function App() {
                         <span className="dark:text-slate-200">{item.val}%</span>
                       </div>
                       <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full transition-all duration-1000 ${rDetails.bar}`} style={{ width: `${item.val}%` }}></div>
+                        <div 
+                          className={`h-full rounded-full animate-grow-width ${rDetails.bar}`} 
+                          style={{ '--target-width': `${item.val}%`, width: `${item.val}%` }}
+                        ></div>
                       </div>
                     </div>
 
@@ -2083,16 +2225,20 @@ export default function App() {
                       </button>
                     </div>
 
-                    {/* Explanations list */}
-                    {(isExpanded || window.matchMedia('print').matches) && (
-                      <div className="bg-slate-950/40 border border-slate-800 rounded-xl p-4 mt-2 animate-fade-in">
-                        <ul className="list-disc pl-4 space-y-1.5 text-xs text-slate-300">
-                          {item.explanations?.map((exp, idx) => (
-                            <li key={idx}>{exp}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    {/* Explanations list (Accordion) */}
+                    <div 
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        (isExpanded || window.matchMedia('print').matches)
+                          ? 'max-h-[300px] opacity-100 mt-3 border border-slate-800 bg-slate-950/40 p-4 rounded-xl' 
+                          : 'max-h-0 opacity-0 mt-0 border-transparent p-0'
+                      }`}
+                    >
+                      <ul className="list-disc pl-4 space-y-1.5 text-xs text-slate-300">
+                        {item.explanations?.map((exp, idx) => (
+                          <li key={idx} className="leading-relaxed">{exp}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 );
               })}
